@@ -31,9 +31,9 @@ public class HttpUtil {
         connManager.setMaxTotal(5);
         connManager.setDefaultMaxPerRoute(5);
         RequestConfig requestConfig = RequestConfig.custom()
-                .setConnectTimeout(5000) // 请求超时时间
-                .setSocketTimeout(5000) // 等待数据超时时间
-                .setConnectionRequestTimeout(5000) // 连接不够用时等待超时时间
+                .setConnectTimeout(10000) // 请求超时时间
+                .setSocketTimeout(10000) // 等待数据超时时间
+                .setConnectionRequestTimeout(10000) // 连接不够用时等待超时时间
                 .build();
         return HttpClients.custom()
                 .setConnectionManager(connManager)// 设置连接池
@@ -43,13 +43,13 @@ public class HttpUtil {
                     public long getKeepAliveDuration(final HttpResponse response, final HttpContext context) {
                         long keepAlive = super.getKeepAliveDuration(response, context);
                         if (keepAlive == -1) {
-                            keepAlive = 5000;
+                            keepAlive = 10000;
                         }
                         return keepAlive;
                     }
                 })
-                .setConnectionTimeToLive(5000L, TimeUnit.MILLISECONDS) // 设置连接存活时间
-                .evictIdleConnections(5L, TimeUnit.SECONDS) // 关闭无效和空闲的连接
+                .setConnectionTimeToLive(10000L, TimeUnit.MILLISECONDS) // 设置连接存活时间
+                .evictIdleConnections(10L, TimeUnit.SECONDS) // 关闭无效和空闲的连接
                 .build();
     }
 

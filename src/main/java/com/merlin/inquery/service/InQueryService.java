@@ -1,5 +1,7 @@
 package com.merlin.inquery.service;
 
+import com.merlin.inquery.facade.QueryService;
+import com.merlin.inquery.model.Result;
 import com.merlin.inquery.model.WfQueryModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +26,7 @@ public class InQueryService implements QueryService {
     @Override
     public void WfQuery(WfQueryModel wfQueryModel) {
         if (paramIllegalCheck(wfQueryModel)) {
-            logger.error("param illegal, please check {}",wfQueryModel);
+            logger.error("param illegal, please check {}", wfQueryModel);
         }
 
         try {
@@ -37,8 +39,8 @@ public class InQueryService implements QueryService {
             //query
             sendService.getQueryResult(wfQueryModel);
 
-        }catch (Exception e){
-            logger.error("wf query exception ",e);
+        } catch (Exception e) {
+            logger.error("wf query exception ", e);
         }
     }
 

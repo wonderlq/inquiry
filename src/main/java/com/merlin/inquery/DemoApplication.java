@@ -25,8 +25,10 @@ public class DemoApplication implements CommandLineRunner {
         wfQueryModel.setFdjh6w("ss");
         wfQueryModel.setHplex("cc");
         wfQueryModel.setVerifyCode("ccc");
+        sendService.getIndexCookie(wfQueryModel);
 
-            sendService.getIndexCookie(wfQueryModel);
+        sendService.getVerifyCode(wfQueryModel);
+        System.out.println(wfQueryModel.getVerifyCode());
     }
 
 

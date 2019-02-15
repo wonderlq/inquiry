@@ -24,6 +24,8 @@ import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.parser.Entity;
 import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -47,6 +49,11 @@ public class SendService {
     @Qualifier("httpClient")
     @Autowired
     CloseableHttpClient httpClient;
+    @Autowired
+    VerifyCodeFactory verifyCodeFactory;
+    @Autowired
+    ImgService imgService;
+
 
 
     /**
@@ -81,8 +88,9 @@ public class SendService {
             if (response.getStatusLine().getStatusCode() == 200) {
                 InputStream instream = response.getEntity().getContent();
                 byte[] bytes = new byte[1024];
-                while (instream.read(bytes) != -1) {
-                    baot.write(bytes); //将读取的字节流写入字节输出流
+                int n;
+                while ((n = instream.read(bytes)) != -1) {
+                    baot.write(bytes, 0, n); //将读取的字节流写入字节输出流
                 }
                 // 更新cookie
                 updateHeadersCookie(wfQueryModel, response.getAllHeaders());
@@ -93,14 +101,25 @@ public class SendService {
             logger.error("getVerifyCode exception", e);
         }
 
+        //测试 图片输出到文件，方便对比
+        FileOutputStream fileOutputStream = new FileOutputStream("/Users/lq/Downloads/inquerypic.png");
+        byte[] bytes = baot.toByteArray();
+        fileOutputStream.write(bytes);
+        fileOutputStream.flush();
+
+        //图片优化处理
+        byte[] afterDeal = imgService.dealImg(bytes); //待完善
+
         //调用验证码解析服务，获取验证码
-        String verifyCode = getCode(baot.toByteArray());
+        String verifyCode = verifyCodeFactory.getCode(afterDeal); //待完善
         if (verifyCode != null) {
             wfQueryModel.setVerifyCode(verifyCode); //设置验证码
         } else {
             throw new Exception("can not analyze verify code");
         }
     }
+
+
 
     /**
      * 真正执行查询
@@ -124,10 +143,6 @@ public class SendService {
         return null;
     }
 
-
-    private String getCode(byte[] toByteArray) {
-        return null;
-    }
 
     private void updateHeadersCookie(WfQueryModel wfQueryModel, Header[] allHeaders) {
         for (Header header : allHeaders) {
@@ -205,5 +220,10 @@ public class SendService {
     private String buildVerifyCodeReqUrl() {
         String nowTimeParam = String.valueOf(System.currentTimeMillis());
         return codeUrl + "?nocache=" + nowTimeParam;
+    }
+
+    private byte[] dealOriginImg(byte[] bytes) throws IOException {
+
+        return imgService.dealImg(bytes);
     }
 }
